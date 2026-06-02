@@ -1,0 +1,58 @@
+﻿@model SportBookingSystem.Models.Court
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Strona główna</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Courts" asp-action="Index">Korty</a></li>
+        <li class="breadcrumb-item active">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <h1 class="fw-bold mb-3">@Model.Name</h1>
+        <p class="lead text-muted">@Model.Description</p>
+
+        <ul class="list-group list-group-flush mb-4">
+            <li class="list-group-item d-flex justify-content-between">
+                <span><i class="bi bi-layers me-2 text-success"></i>Nawierzchnia</span>
+                <strong>@Model.Surface</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span><i class="bi bi-house me-2 text-success"></i>Typ</span>
+                <strong>@(Model.IsIndoor ? "Kryty" : "Otwarty")</strong>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <span><i class="bi bi-currency-exchange me-2 text-success"></i>Cena za godzinę</span>
+                <strong class="text-success fs-5">@Model.PricePerHour zł</strong>
+            </li>
+        </ul>
+    </div>
+    <div class="col-md-5">
+        <div class="card shadow border-success">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-calendar-check display-3 text-success mb-3"></i>
+                <h5 class="fw-bold">Gotowy do rezerwacji?</h5>
+                <p class="text-muted">Wybierz wolny termin i zarezerwuj kort w kilka sekund.</p>
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <a asp-controller="Reservations" asp-action="Create" asp-route-courtId="@Model.Id"
+                       class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-calendar-plus me-2"></i>Zarezerwuj ten kort
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-success btn-lg w-100">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Zaloguj się, aby zarezerwować
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

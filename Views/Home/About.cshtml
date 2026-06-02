@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "O nas";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-5 fw-bold"><i class="bi bi-trophy-fill text-success me-3"></i>O nas</h1>
+    <p class="lead text-muted">Twój lokalny klub tenisowy z nowoczesnym systemem rezerwacji online.</p>
+</div>
+
+<div class="row g-4 align-items-center mb-5">
+    <div class="col-md-6">
+        <h3 class="fw-bold">Dlaczego SportBooking?</h3>
+        <p>Nasz system powstał z myślą o wygodzie klientów – chcemy, żebyś mógł zarezerwować kort w dowolnym miejscu i czasie, bez konieczności dzwonienia do recepcji.</p>
+        <ul class="list-unstyled">
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Rezerwacja online 24/7</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>3 korty do wyboru</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Podgląd dostępności w czasie rzeczywistym</li>
+            <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Historia rezerwacji w koncie użytkownika</li>
+        </ul>
+    </div>
+    <div class="col-md-6 text-center">
+        <div class="bg-success text-white rounded-4 p-5">
+            <i class="bi bi-people-fill display-3 mb-3"></i>
+            <h4>Dołącz do nas!</h4>
+            <p>Zarejestruj się za darmo i zarezerwuj swój pierwszy kort już dziś.</p>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-light btn-lg">
+                <i class="bi bi-person-plus me-2"></i>Zarejestruj się
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,8 +1,113 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<SportBookingSystem.Models.Court>
+
+@{
+    ViewData["Title"] = "Strona główna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="hero-section bg-success text-white rounded-4 p-5 mb-5 text-center shadow">
+    <h1 class="display-4 fw-bold mb-3">
+        <i class="bi bi-trophy-fill me-3"></i>SportBooking
+    </h1>
+    <p class="lead mb-4">Zarezerwuj kort tenisowy online – szybko, wygodnie, bez dzwonienia do recepcji.</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+        <a asp-controller="Courts" asp-action="Index" class="btn btn-light btn-lg px-4 fw-semibold">
+            <i class="bi bi-search me-2"></i>Przeglądaj korty
+        </a>
+        @if (!User.Identity!.IsAuthenticated)
+        {
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-light btn-lg px-4">
+                <i class="bi bi-person-plus me-2"></i>Zarejestruj się
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Reservations" asp-action="Index" class="btn btn-outline-light btn-lg px-4">
+                <i class="bi bi-calendar-check me-2"></i>Moje rezerwacje
+            </a>
+        }
+    </div>
 </div>
+
+<!-- Zalety -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-3">
+            <div class="card-body">
+                <i class="bi bi-clock-history display-5 text-success mb-3"></i>
+                <h5 class="fw-bold">Rezerwacja 24/7</h5>
+                <p class="text-muted">Rezerwuj kortów o każdej porze dnia i nocy, bez konieczności dzwonienia.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-3">
+            <div class="card-body">
+                <i class="bi bi-phone display-5 text-success mb-3"></i>
+                <h5 class="fw-bold">Działa na telefonie</h5>
+                <p class="text-muted">Responsywny design – działa na każdym urządzeniu mobilnym i tablecie.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm text-center p-3">
+            <div class="card-body">
+                <i class="bi bi-shield-check display-5 text-success mb-3"></i>
+                <h5 class="fw-bold">Bezpieczne logowanie</h5>
+                <p class="text-muted">Twoje dane są bezpieczne dzięki szyfrowanemu systemowi kont i autoryzacji.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Polecane korty -->
+<h2 class="fw-bold mb-4"><i class="bi bi-star-fill text-warning me-2"></i>Nasze korty</h2>
+<div class="row g-4 mb-5">
+    @foreach (var court in Model)
+    {
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm court-card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">@court.Name</span>
+                    @if (court.IsIndoor)
+                    {
+                        <span class="badge bg-light text-dark"><i class="bi bi-house me-1"></i>Kryty</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-dark"><i class="bi bi-sun me-1"></i>Otwarty</span>
+                    }
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">@court.Description</p>
+                    <p class="mb-1"><i class="bi bi-layers me-2 text-success"></i><strong>Nawierzchnia:</strong> @court.Surface</p>
+                    <p class="fs-5 fw-bold text-success mt-2">
+                        <i class="bi bi-currency-exchange me-1"></i>@court.PricePerHour zł / godz.
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <a asp-controller="Reservations" asp-action="Create" asp-route-courtId="@court.Id"
+                           class="btn btn-success w-100">
+                            <i class="bi bi-calendar-plus me-2"></i>Zarezerwuj
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-success w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Zaloguj się, aby zarezerwować
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="text-center">
+    <a asp-controller="Courts" asp-action="Index" class="btn btn-outline-success btn-lg">
+        <i class="bi bi-grid me-2"></i>Zobacz wszystkie korty
+    </a>
+</div>
+

@@ -1,0 +1,52 @@
+﻿@model SportBookingSystem.Models.Court
+
+<div class="mb-3">
+    <label asp-for="Name" class="form-label fw-semibold"></label>
+    <input asp-for="Name" class="form-control" placeholder="np. Kort 4 – Mączka" />
+    <span asp-validation-for="Name" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Description" class="form-label fw-semibold"></label>
+    <textarea asp-for="Description" class="form-control" rows="3"
+              placeholder="Krótki opis kortu..."></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col">
+        <label asp-for="PricePerHour" class="form-label fw-semibold"></label>
+        <div class="input-group">
+            <input asp-for="PricePerHour" class="form-control" type="number" step="0.01" min="1" />
+            <span class="input-group-text">zł/godz.</span>
+        </div>
+        <span asp-validation-for="PricePerHour" class="text-danger small"></span>
+    </div>
+    <div class="col">
+        <label asp-for="Surface" class="form-label fw-semibold"></label>
+        <select asp-for="Surface" class="form-select">
+            <option value="">-- Wybierz nawierzchnię --</option>
+            <option value="Twarda">Twarda</option>
+            <option value="Mączka">Mączka</option>
+            <option value="Trawa">Trawa</option>
+            <option value="Syntetyczna">Syntetyczna</option>
+        </select>
+        <span asp-validation-for="Surface" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col">
+        <div class="form-check form-switch">
+            <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
+            <label asp-for="IsActive" class="form-check-label">Aktywny (widoczny dla klientów)</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-check form-switch">
+            <input asp-for="IsIndoor" class="form-check-input" type="checkbox" role="switch" />
+            <label asp-for="IsIndoor" class="form-check-label">Kryty (halowy)</label>
+        </div>
+    </div>
+</div>
+

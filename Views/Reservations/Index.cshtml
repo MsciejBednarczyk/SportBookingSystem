@@ -1,0 +1,78 @@
+﻿@model IEnumerable<SportBookingSystem.Models.Reservation>
+
+@{
+    ViewData["Title"] = "Moje rezerwacje";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold"><i class="bi bi-calendar-check-fill text-success me-3"></i>Moje rezerwacje</h1>
+    <a asp-controller="Courts" asp-action="Index" class="btn btn-success">
+        <i class="bi bi-plus-lg me-1"></i>Nowa rezerwacja
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="bi bi-calendar-x display-3 text-muted mb-3"></i>
+        <h4 class="text-muted">Nie masz jeszcze żadnych rezerwacji</h4>
+        <a asp-controller="Courts" asp-action="Index" class="btn btn-success mt-3">
+            <i class="bi bi-search me-2"></i>Przeglądaj dostępne korty
+        </a>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var r in Model)
+        {
+            <div class="col-12">
+                <div class="card shadow-sm @(r.Status == SportBookingSystem.Models.ReservationStatus.Cancelled ? "opacity-50" : "")">
+                    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">@r.Court?.Name</h5>
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-calendar3 me-1"></i>@r.ReservationDate.ToString("dd.MM.yyyy")
+                                &nbsp;|&nbsp;
+                                <i class="bi bi-clock me-1"></i>@r.StartTime.ToString(@"hh\:mm") – @r.EndTime.ToString(@"hh\:mm")
+                            </p>
+                            @if (!string.IsNullOrEmpty(r.Notes))
+                            {
+                                <small class="text-muted"><i class="bi bi-chat-left-text me-1"></i>@r.Notes</small>
+                            }
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-5 fw-bold text-success mb-1">@r.TotalPrice.ToString("F2") zł</div>
+                            @switch (r.Status)
+                            {
+                                case SportBookingSystem.Models.ReservationStatus.Active:
+                                    <span class="badge bg-success">Aktywna</span>
+                                    break;
+                                case SportBookingSystem.Models.ReservationStatus.Cancelled:
+                                    <span class="badge bg-danger">Anulowana</span>
+                                    break;
+                                case SportBookingSystem.Models.ReservationStatus.Completed:
+                                    <span class="badge bg-secondary">Zakończona</span>
+                                    break;
+                            }
+                        </div>
+                        @if (r.Status == SportBookingSystem.Models.ReservationStatus.Active && r.ReservationDate >= DateTime.Today)
+                        {
+                            <div>
+                                <form asp-action="Cancel" asp-route-id="@r.Id" method="post"
+                                      onsubmit="return confirm('Czy na pewno chcesz anulować tę rezerwację?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Anuluj
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+

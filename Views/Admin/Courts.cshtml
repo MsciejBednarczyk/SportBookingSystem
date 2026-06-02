@@ -1,0 +1,64 @@
+﻿@model IEnumerable<SportBookingSystem.Models.Court>
+
+@{
+    ViewData["Title"] = "Zarządzanie kortami";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold"><i class="bi bi-grid-3x3-gap-fill text-success me-3"></i>Zarządzanie kortami</h1>
+    <a asp-action="CourtCreate" class="btn btn-success">
+        <i class="bi bi-plus-lg me-1"></i>Dodaj kort
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-success">
+                <tr>
+                    <th>Nazwa</th>
+                    <th>Nawierzchnia</th>
+                    <th>Cena / godz.</th>
+                    <th>Typ</th>
+                    <th>Status</th>
+                    <th class="text-center">Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var court in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@court.Name</td>
+                        <td>@court.Surface</td>
+                        <td>@court.PricePerHour zł</td>
+                        <td>@(court.IsIndoor ? "Kryty" : "Otwarty")</td>
+                        <td>
+                            @if (court.IsActive)
+                            {
+                                <span class="badge bg-success">Aktywny</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Nieaktywny</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <a asp-action="CourtEdit" asp-route-id="@court.Id"
+                               class="btn btn-sm btn-outline-primary me-1">
+                                <i class="bi bi-pencil"></i> Edytuj
+                            </a>
+                            <form asp-action="CourtDelete" asp-route-id="@court.Id" method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Czy na pewno chcesz usunąć kort \"@court.Name\"? Spowoduje to usunięcie wszystkich powiązanych rezerwacji!');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Usuń
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

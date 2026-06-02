@@ -1,0 +1,175 @@
+﻿@model SportBookingSystem.Models.CreateReservationViewModel
+
+@{
+    ViewData["Title"] = "Nowa rezerwacja";
+}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Courts" asp-action="Index">Korty</a></li>
+        <li class="breadcrumb-item active">Rezerwacja</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Nowa rezerwacja – @Model.Court?.Name</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" id="reservationForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CourtId" />
+
+                    <div class="mb-3">
+                        <label asp-for="ReservationDate" class="form-label fw-semibold"></label>
+                        <input asp-for="ReservationDate" type="date" class="form-control"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                               id="reservationDate" />
+                        <span asp-validation-for="ReservationDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col">
+                            <label asp-for="StartTimeStr" class="form-label fw-semibold"></label>
+                            <select asp-for="StartTimeStr" class="form-select" id="startTime">
+                                @for (int h = 7; h <= 21; h++)
+                                {
+                                    <option value="@h.ToString("D2"):00">@h.ToString("D2"):00</option>
+                                }
+                            </select>
+                            <span asp-validation-for="StartTimeStr" class="text-danger small"></span>
+                        </div>
+                        <div class="col">
+                            <label asp-for="EndTimeStr" class="form-label fw-semibold"></label>
+                            <select asp-for="EndTimeStr" class="form-select" id="endTime">
+                                @for (int h = 8; h <= 22; h++)
+                                {
+                                    <option value="@h.ToString("D2"):00">@h.ToString("D2"):00</option>
+                                }
+                            </select>
+                            <span asp-validation-for="EndTimeStr" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Notes" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Notes" class="form-control" rows="2"
+                                  placeholder="np. potrzebuję rakiety..."></textarea>
+                        <span asp-validation-for="Notes" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Dynamiczna kalkulacja ceny (JavaScript) -->
+                    <div class="alert alert-success" id="priceBox">
+                        <i class="bi bi-calculator me-2"></i>
+                        <strong>Szacowana cena:</strong>
+                        <span id="calculatedPrice">–</span>
+                    </div>
+
+                    <!-- Dostępność terminu -->
+                    <div id="availabilityBox" class="alert d-none"></div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Potwierdź rezerwację
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: info o korcie -->
+    <div class="col-md-5">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-light fw-bold">
+                <i class="bi bi-info-circle me-2 text-success"></i>Informacje o korcie
+            </div>
+            <div class="card-body">
+                <h5 class="fw-bold">@Model.Court?.Name</h5>
+                <p class="text-muted">@Model.Court?.Description</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-layers me-2 text-success"></i>@Model.Court?.Surface</li>
+                    <li><i class="bi bi-currency-exchange me-2 text-success"></i><strong>@Model.Court?.PricePerHour zł / godz.</strong></li>
+                    <li><i class="bi bi-house me-2 text-success"></i>@(Model.Court?.IsIndoor == true ? "Kryty" : "Otwarty")</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light fw-bold">
+                <i class="bi bi-clock-history me-2 text-success"></i>Zajęte godziny (wybrany dzień)
+            </div>
+            <div class="card-body">
+                <div id="occupiedSlots">
+                    <p class="text-muted small">Wybierz datę, aby zobaczyć zajęte godziny.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        const pricePerHour = @Model.Court?.PricePerHour;
+        const courtId = @Model.CourtId;
+
+        const dateInput = document.getElementById('reservationDate');
+        const startSelect = document.getElementById('startTime');
+        const endSelect = document.getElementById('endTime');
+        const priceSpan = document.getElementById('calculatedPrice');
+        const availBox = document.getElementById('availabilityBox');
+        const slotsDiv = document.getElementById('occupiedSlots');
+
+        function updatePrice() {
+            const start = parseInt(startSelect.value.split(':')[0]);
+            const end = parseInt(endSelect.value.split(':')[0]);
+            const hours = end - start;
+            if (hours > 0) {
+                const total = (hours * pricePerHour).toFixed(2);
+                priceSpan.textContent = `${total} zł (${hours} godz.)`;
+            } else {
+                priceSpan.textContent = '– (nieprawidłowy zakres)';
+            }
+        }
+
+        async function checkAvailability() {
+            const date = dateInput.value;
+            if (!date) return;
+
+            try {
+                const res = await fetch(`/Reservations/CheckAvailability?courtId=${courtId}&date=${date}`);
+                const reservations = await res.json();
+
+                if (reservations.length === 0) {
+                    slotsDiv.innerHTML = '<p class="text-success small"><i class="bi bi-check-circle me-1"></i>Brak zajętych godzin w tym dniu!</p>';
+                } else {
+                    let html = '<ul class="list-unstyled mb-0">';
+                    reservations.forEach(r => {
+                        const s = r.startTime.substring(0, 5);
+                        const e = r.endTime.substring(0, 5);
+                        html += `<li class="text-danger small"><i class="bi bi-x-circle me-1"></i>${s} – ${e}</li>`;
+                    });
+                    html += '</ul>';
+                    slotsDiv.innerHTML = html;
+                }
+            } catch (e) {
+                slotsDiv.innerHTML = '<p class="text-muted small">Nie udało się sprawdzić dostępności.</p>';
+            }
+        }
+
+        startSelect.addEventListener('change', updatePrice);
+        endSelect.addEventListener('change', updatePrice);
+        dateInput.addEventListener('change', checkAvailability);
+
+        // Inicjalizacja przy załadowaniu strony
+        updatePrice();
+        if (dateInput.value) checkAvailability();
+    </script>
+}
+
