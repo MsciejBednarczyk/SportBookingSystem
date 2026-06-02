@@ -47,9 +47,9 @@
                                class="btn btn-sm btn-outline-primary me-1">
                                 <i class="bi bi-pencil"></i> Edytuj
                             </a>
-                            <form asp-action="CourtDelete" asp-route-id="@court.Id" method="post"
-                                  class="d-inline"
-                                  onsubmit="return confirm('Czy na pewno chcesz usunąć kort \"@court.Name\"? Spowoduje to usunięcie wszystkich powiązanych rezerwacji!');">
+                            <form asp-action="CourtDelete" asp-route-id="@court.Id"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Czy na pewno chcesz usunąć ten kort?')">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i> Usuń

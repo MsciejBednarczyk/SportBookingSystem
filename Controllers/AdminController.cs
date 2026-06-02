@@ -1,65 +1,124 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Data;
+using SportBookingSystem.Models;
 
-namespace SportBookingSystem.Models
+namespace SportBookingSystem.Controllers
 {
-    // Rozszerzenie domyślnego użytkownika Identity – wzorzec z zajęć
-    public class ApplicationUser : IdentityUser
+    [Authorize(Roles = "Admin")]
+    public class AdminController : Controller
     {
-        [Display(Name = "Imię")]
-        [StringLength(50)]
-        public string? FirstName { get; set; }
+        private readonly ApplicationDbContext _context;
 
-        [Display(Name = "Nazwisko")]
-        [StringLength(50)]
-        public string? LastName { get; set; }
+        public AdminController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-        [Display(Name = "Numer telefonu")]
-        public string? PhoneNumber { get; set; }
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.TotalCourts = await _context.Courts.CountAsync();
+            ViewBag.ActiveReservations = await _context.Reservations
+                .CountAsync(r => r.Status == ReservationStatus.Active);
+            ViewBag.TotalReservations = await _context.Reservations.CountAsync();
+            ViewBag.Revenue = await _context.Reservations
+                .Where(r => r.Status != ReservationStatus.Cancelled)
+                .SumAsync(r => r.TotalPrice);
+            return View();
+        }
 
-        public string FullName => $"{FirstName} {LastName}".Trim();
+        public async Task<IActionResult> Courts()
+        {
+            var courts = await _context.Courts.OrderBy(c => c.Name).ToListAsync();
+            return View(courts);
+        }
 
-        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
-    }
+        [HttpGet]
+        public IActionResult CourtCreate()
+        {
+            return View(new Court());
+        }
 
-    // Model z zajęć – GET/POST z walidacją
-    public class SimpleMessageModel
-    {
-        [Required(ErrorMessage = "Proszę podać swoje imię.")]
-        [Display(Name = "Twoje imię")]
-        public string? Name { get; set; }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CourtCreate(Court court)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Courts.Add(court);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Kort \"{court.Name}\" został dodany.";
+                return RedirectToAction(nameof(Courts));
+            }
+            return View(court);
+        }
 
-        [Required(ErrorMessage = "Proszę wpisać wiadomość.")]
-        [Display(Name = "Wiadomość")]
-        public string? Message { get; set; }
-    }
+        [HttpGet]
+        public async Task<IActionResult> CourtEdit(int? id)
+        {
+            if (id == null) return NotFound();
+            var court = await _context.Courts.FindAsync(id);
+            if (court == null) return NotFound();
+            return View(court);
+        }
 
-    // ViewModel do tworzenia rezerwacji
-    public class CreateReservationViewModel
-    {
-        [Required]
-        public int CourtId { get; set; }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CourtEdit(int id, Court court)
+        {
+            if (id != court.Id) return NotFound();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(court);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"Kort \"{court.Name}\" został zaktualizowany.";
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _context.Courts.AnyAsync(c => c.Id == id))
+                        return NotFound();
+                    throw;
+                }
+                return RedirectToAction(nameof(Courts));
+            }
+            return View(court);
+        }
 
-        [Required(ErrorMessage = "Data jest wymagana.")]
-        [Display(Name = "Data rezerwacji")]
-        [DataType(DataType.Date)]
-        public DateTime ReservationDate { get; set; } = DateTime.Today;
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CourtDelete(int id)
+        {
+            var court = await _context.Courts.FindAsync(id);
+            if (court == null) return NotFound();
+            _context.Courts.Remove(court);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = $"Kort \"{court.Name}\" został usunięty.";
+            return RedirectToAction(nameof(Courts));
+        }
 
-        [Required(ErrorMessage = "Godzina rozpoczęcia jest wymagana.")]
-        [Display(Name = "Godzina rozpoczęcia")]
-        public string StartTimeStr { get; set; } = "08:00";
+        public async Task<IActionResult> Reservations()
+        {
+            var reservations = await _context.Reservations
+                .Include(r => r.Court)
+                .Include(r => r.User)
+                .OrderByDescending(r => r.ReservationDate)
+                .ToListAsync();
+            return View(reservations);
+        }
 
-        [Required(ErrorMessage = "Godzina zakończenia jest wymagana.")]
-        [Display(Name = "Godzina zakończenia")]
-        public string EndTimeStr { get; set; } = "09:00";
-
-        [Display(Name = "Uwagi")]
-        [StringLength(300)]
-        public string? Notes { get; set; }
-
-        // Do wyświetlenia w formularzu
-        public Court? Court { get; set; }
-        public decimal CalculatedPrice { get; set; }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReservationDelete(int id)
+        {
+            var reservation = await _context.Reservations.FindAsync(id);
+            if (reservation == null) return NotFound();
+            _context.Reservations.Remove(reservation);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Rezerwacja została usunięta.";
+            return RedirectToAction(nameof(Reservations));
+        }
     }
 }
-

@@ -1,10 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace SportBookingSystem.Models
 {
-    // Rozszerzenie domyślnego użytkownika Identity – wzorzec z zajęć
     public class ApplicationUser : IdentityUser
     {
         [Display(Name = "Imię")]
@@ -23,7 +21,6 @@ namespace SportBookingSystem.Models
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 
-    // Model z zajęć – GET/POST z walidacją
     public class SimpleMessageModel
     {
         [Required(ErrorMessage = "Proszę podać swoje imię.")]
@@ -35,7 +32,6 @@ namespace SportBookingSystem.Models
         public string? Message { get; set; }
     }
 
-    // ViewModel do tworzenia rezerwacji
     public class CreateReservationViewModel
     {
         [Required]
@@ -58,7 +54,6 @@ namespace SportBookingSystem.Models
         [StringLength(300)]
         public string? Notes { get; set; }
 
-        // Do wyświetlenia w formularzu
         public Court? Court { get; set; }
         public decimal CalculatedPrice { get; set; }
     }
