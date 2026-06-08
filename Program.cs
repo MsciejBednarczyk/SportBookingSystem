@@ -12,7 +12,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// --- Konfiguracja Identity (autentykacja i autoryzacja z zajêæ) ---
+// --- Konfiguracja Identity (autentykacja i autoryzacja z zajï¿½ï¿½) ---
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false; // uproszczone dla projektu lokalnego
@@ -29,7 +29,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// --- Inicjalizacja ról i admina ---
+// --- Inicjalizacja rï¿½l i admina ---
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

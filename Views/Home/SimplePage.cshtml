@@ -1,77 +1,48 @@
-﻿@model SportBookingSystem.Models.SimpleMessageModel
-
-@{
-    ViewData["Title"] = "Kontakt – GET / POST";
+﻿@{
+    ViewData["Title"] = "Kontakt";
 }
 
-<div class="text-center mb-4">
-    <h1 class="display-5 fw-bold"><i class="bi bi-envelope-fill text-success me-3"></i>Kontakt</h1>
-    <p class="text-muted">Przykład działania metod <strong>GET</strong> i <strong>POST</strong> w ASP.NET Core MVC.</p>
-    <small class="badge bg-secondary">
-        Temat z zajęć: /Home/SimplePage?name=Jan&message=Test
-    </small>
-</div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white p-4 text-center">
+                    <h2 class="mb-0"><i class="bi bi-envelope-fill me-2"></i>Napisz do nas</h2>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted text-center mb-4">
+                        Masz pytania dotyczące rezerwacji kortów lub funkcjonowania obiektu?
+                        Skorzystaj z poniższego formularza.
+                    </p>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
+                    <form asp-action="SimplePage" method="post">
+                        @* ASP.NET Core Validation Summary - pokaże ewentualne błędy *@
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-        @* Komunikat o sukcesie po wysłaniu POST *@
-        @if (ViewData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>@ViewData["SuccessMessage"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Twoje Imię</label>
+                            <input type="text" name="name" class="form-control form-control-lg"
+                                   placeholder="Wpisz swoje imię i nazwisko" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Wiadomość</label>
+                            <textarea name="message" class="form-control" rows="5"
+                                      placeholder="W czym możemy pomóc?" required></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                Wyślij zapytanie
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        }
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <i class="bi bi-send me-2"></i>Wyślij wiadomość (POST)
-            </div>
-            <div class="card-body">
-                @* Formularz – wywołuje metodę POST *@
-                <form asp-action="SimplePage" method="post">
-                    <div class="form-group mb-3">
-                        <label asp-for="Name" class="form-label fw-semibold"></label>
-                        <input asp-for="Name" class="form-control" placeholder="Wpisz swoje imię..." />
-                        <span asp-validation-for="Name" class="text-danger small"></span>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label asp-for="Message" class="form-label fw-semibold"></label>
-                        <textarea asp-for="Message" class="form-control" rows="4" placeholder="Treść wiadomości..."></textarea>
-                        <span asp-validation-for="Message" class="text-danger small"></span>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <i class="bi bi-send-fill me-2"></i>Wyślij (POST)
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="card mt-3 shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                <i class="bi bi-link-45deg me-2"></i>Test metody GET z parametrami w URL
-            </div>
-            <div class="card-body">
-                <p class="text-muted small mb-2">Kliknij poniższy link, aby wywołać metodę GET z parametrami wpisanymi w URL:</p>
-                <a asp-controller="Home" asp-action="SimplePage"
-                   asp-route-name="Anna" asp-route-message="Witaj z metody GET!"
-                   class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-right-circle me-1"></i>
-                    /Home/SimplePage?name=Anna&message=Witaj...
-                </a>
+            <div class="mt-4 text-center text-muted">
+                <small><i class="bi bi-info-circle me-1"></i> Odpowiemy na Twoją wiadomość w ciągu 24h.</small>
             </div>
         </div>
     </div>
 </div>
-
-@* Walidacja po stronie klienta (bez przeładowania strony) – z zajęć *@
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
