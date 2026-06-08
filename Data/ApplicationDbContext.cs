@@ -11,6 +11,7 @@ namespace SportBookingSystem.Data
         {
         }
 
+        public DbSet<ContactMessage> ContactMessages { get; set; }
         public DbSet<Court> Courts { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
 

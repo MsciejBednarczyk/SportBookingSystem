@@ -99,6 +99,20 @@ namespace SportBookingSystem.Controllers
             return RedirectToAction(nameof(Courts));
         }
 
+
+        // Akcja wyświetlająca wiadomości
+        public async Task<IActionResult> Messages()
+        {
+            var messages = await _context.ContactMessages.ToListAsync();
+            return View(messages);
+        }
+
+        public async Task<IActionResult> Users()
+        {
+            var users = await _context.Users.ToListAsync();
+            return View(users);
+        }
+
         public async Task<IActionResult> Reservations()
         {
             var reservations = await _context.Reservations

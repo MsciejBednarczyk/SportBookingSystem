@@ -43,17 +43,31 @@ namespace SportBookingSystem.Controllers
             return View(model);
         }
 
-        // POST /Home/SimplePage
-        [HttpPost]
-        public IActionResult SimplePage(SimpleMessageModel model)
+  // POST /Home/SimplePage
+[HttpPost]
+        public async Task<IActionResult> SimplePage(SimpleMessageModel model) // Zmieniamy na async Task
         {
             if (ModelState.IsValid)
             {
-                ViewData["SuccessMessage"] = $"Czeœæ {model.Name}! Twoja wiadomoœæ: '{model.Message}' zosta³a odebrana.";
+                // 1. Tworzymy obiekt, który "rozumie" baza danych
+                var newMessage = new ContactMessage
+                {
+                    Name = model.Name,
+                    Message = model.Message
+                };
+
+                // 2. Dodajemy do bazy i zapisujemy
+                _context.ContactMessages.Add(newMessage);
+                await _context.SaveChangesAsync();
+
+                // 3. Komunikat dla u¿ytkownika
+                ViewData["SuccessMessage"] = $"Czeœæ {model.Name}! Twoja wiadomoœæ zosta³a wys³ana i zapisana w systemie.";
+
+                // Czyœcimy formularz po wys³aniu
                 return View(new SimpleMessageModel());
             }
 
-            // Jeœli walidacja nie przejdzie – wracamy z b³êdami
+            // Jeœli coœ posz³o nie tak (np. puste pole), wracamy do formularza
             return View(model);
         }
 
