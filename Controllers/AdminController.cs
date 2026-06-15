@@ -100,7 +100,7 @@ namespace SportBookingSystem.Controllers
         }
 
 
-        // Akcja wyświetlająca wiadomości
+   
         public async Task<IActionResult> Messages()
         {
             var messages = await _context.ContactMessages.ToListAsync();

@@ -7,7 +7,7 @@ using SportBookingSystem.Models;
 
 namespace SportBookingSystem.Controllers
 {
-    [Authorize] // Tylko zalogowani użytkownicy
+    [Authorize] 
     public class ReservationsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +19,7 @@ namespace SportBookingSystem.Controllers
             _userManager = userManager;
         }
 
-        // GET: /Reservations – moje rezerwacje
+        
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
@@ -32,7 +32,7 @@ namespace SportBookingSystem.Controllers
             return View(reservations);
         }
 
-        // GET: /Reservations/Create?courtId=1
+       
         [HttpGet]
         public async Task<IActionResult> Create(int courtId)
         {
@@ -50,18 +50,18 @@ namespace SportBookingSystem.Controllers
             return View(model);
         }
 
-        // POST: /Reservations/Create
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateReservationViewModel model)
         {
-            // Wczytaj kort do modelu (potrzebny do wyświetlenia przy błędzie)
+           
             model.Court = await _context.Courts.FindAsync(model.CourtId);
 
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Parsuj godziny
+           
             if (!TimeSpan.TryParse(model.StartTimeStr, out var startTime) ||
                 !TimeSpan.TryParse(model.EndTimeStr, out var endTime))
             {
@@ -75,7 +75,7 @@ namespace SportBookingSystem.Controllers
                 return View(model);
             }
 
-            // Sprawdzenie kolizji rezerwacji
+            
             bool isCollision = await _context.Reservations.AnyAsync(r =>
                 r.CourtId == model.CourtId &&
                 r.ReservationDate.Date == model.ReservationDate.Date &&
@@ -112,7 +112,7 @@ namespace SportBookingSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Reservations/Cancel/5
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)
@@ -130,7 +130,7 @@ namespace SportBookingSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Reservations/CheckAvailability?courtId=1&date=2025-06-10
+        
         [HttpGet]
         public async Task<IActionResult> CheckAvailability(int courtId, DateTime date)
         {

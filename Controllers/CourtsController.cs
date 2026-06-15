@@ -15,7 +15,7 @@ namespace SportBookingSystem.Controllers
             _context = context;
         }
 
-        // GET: /Courts – lista wszystkich kortów (publiczna)
+        //  lista wszystkich kortów 
         public async Task<IActionResult> Index()
         {
             var courts = await _context.Courts
@@ -26,7 +26,7 @@ namespace SportBookingSystem.Controllers
             return View(courts);
         }
 
-        // GET: /Courts/Details/5 – szczegóły kortu
+        //  szczegóły kortu
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();

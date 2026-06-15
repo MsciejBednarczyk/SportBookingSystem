@@ -93,7 +93,7 @@ Aplikacja uruchomi się pod adresem `https://localhost:XXXX`.
 ```
 SportBookingSystem/
 ├── Controllers/
-│   ├── HomeController.cs          # Strona główna + SimplePage GET/POST (z zajęć)
+│   ├── HomeController.cs          # Strona główna + SimplePage GET/POST 
 │   ├── CourtsController.cs        # Publiczna lista kortów
 │   ├── ReservationsController.cs  # Rezerwacje użytkownika
 │   └── AdminController.cs         # Panel administracyjny (CRUD)
